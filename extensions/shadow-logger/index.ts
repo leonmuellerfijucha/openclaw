@@ -1,7 +1,7 @@
 import { createSubsystemLogger } from "openclaw/plugin-sdk/logging-core";
 import { registerInternalHook, type InternalHookEvent, isMessageReceivedEvent, isMessageSentEvent } from "openclaw/plugin-sdk/hook-runtime";
 import type { PluginRuntime, PluginLogger } from "openclaw/plugin-sdk/plugin-runtime";
-import { createSupabaseClient } from "./supabase-client.js";
+import { createSupabaseApiClient } from "./supabase-api-client.js";
 
 /**
  * ShadowLoggerPlugin
@@ -13,7 +13,7 @@ import { createSupabaseClient } from "./supabase-client.js";
  */
 export class ShadowLoggerPlugin {
   private logger: PluginLogger;
-  private supabase: ReturnType<typeof createSupabaseClient> | undefined;
+  private supabase: ReturnType<typeof createSupabaseApiClient> | undefined;
 
   constructor(logger: PluginLogger) {
     this.logger = logger;
@@ -23,7 +23,7 @@ export class ShadowLoggerPlugin {
     this.logger.info("Shadow Logger Plugin starting...");
 
     try {
-      this.supabase = createSupabaseClient();
+      this.supabase = createSupabaseApiClient();
       this.logger.info("Shadow Logger: Supabase client initialized.");
     } catch (err) {
       this.logger.error(`Shadow Logger: Failed to initialize Supabase client: ${err}`);
@@ -55,13 +55,8 @@ export class ShadowLoggerPlugin {
 
     try {
       const payload = this.extractPayload(event);
-      const { error } = await this.supabase.schema("shadow_log").from("messages").insert(payload);
-
-      if (error) {
-        this.logger.error(`Shadow Logger: Supabase insert error [${event.type}:${event.action}]: ${error.message}`);
-      } else {
-        this.logger.debug(`Shadow Logger: Successfully logged ${event.type}:${event.action} to Supabase.`);
-      }
+      await this.supabase.insert("shadow_log", "messages", payload);
+      this.logger.debug(`Shadow Logger: Successfully logged ${event.type}:${event.action} to Supabase.`);
     } catch (err) {
       this.logger.error(`Shadow Logger: Unexpected error during Supabase logging: ${err}`);
     }
