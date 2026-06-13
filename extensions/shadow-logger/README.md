@@ -12,7 +12,7 @@ This plugin follows the **"Shadow Logging"** approach. Instead of forcing the AI
 
 1.  **Event Capture:** The plugin listens for internal system hooks: `message:received` and `message:sent`.
 2.  **Passive Recording:** Whenever these hooks fire, the plugin immediately captures the event payload.
-3.  **Direct Persistence:** The payload is sent via a direct, encrypted HTTPS connection (using `@supabase/supabase-js`) to the `shadow_log.messages` table in Supabase.
+3.  **Direct Persistence:** The payload is sent via a direct, encrypted HTTPS connection (using native `fetch`) to the `shadow_log.messages` table in Supabase.
 4.  **Decoupling:** This process is entirely decoupled from the Agent's reasoning loop. The Agent remains fast and focused, while the memory foundation is built silently in the background.
 
 ## Technical Specification
@@ -59,4 +59,4 @@ Ensure the following are set in your `.env` file:
 
 - **Runtime:** Runs as a plugin within the OpenClaw process.
 - **Hooks used:** `message:received`, `message:sent`.
-- **Dependency:** `@supabase/supabase-js`.
+- **Dependency:** None (uses native `fetch`).
