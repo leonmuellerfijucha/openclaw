@@ -3,8 +3,9 @@
   "label": "Shadow Logger",
   "description": "Logs all received and sent messages to Supabase for long-term memory distillation.",
   "version": "0.1.0",
-  "manifest": {
-    "pluginId": "shadow-logger",
-    "configSchema": {}
+  "configSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
   }
 }
